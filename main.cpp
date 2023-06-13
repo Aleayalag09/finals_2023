@@ -4,8 +4,10 @@
 //!
 //! This code is needed to run your solution locally. Any changes will be lost once you upload your solution!
 
+
 #include "solution.h"
 #include <iostream>
+#include <filesystem>
 
 bool verify_if_correct(const std::vector<ec::Float>& maxSpectrum, const std::vector<ec::Float>& refSpectrum);
 
@@ -13,13 +15,14 @@ int main()
 {
   try
   {
-    auto inputSignal = ec::SignalReader::readSignal("./input_signal.txt");
+     auto inputSignal = ec::SignalReader::readSignal("./input_signal.txt");
     std::vector<ec::Float> maxSpectrum;
     { // Scope of score measurement - start
 
       ec::Measurement scoreMeasurement;
 
-      maxSpectrum = process_signal(inputSignal); 
+      maxSpectrum = process_signal(inputSignal);
+
     } // Scope of score measurement - end
 
     std::vector<ec::Float> refSpectrum = ec::SignalReader::readSignal("./reference_spectrum.txt");

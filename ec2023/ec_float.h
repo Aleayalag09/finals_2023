@@ -9,7 +9,9 @@
 #include "ec_measurement.h"
 #include "ec_float.h"
 
+#include <cmath>
 #include <vector>
+
 
 namespace ec
 {
