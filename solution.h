@@ -12,15 +12,11 @@ static constexpr float OVERLAP_RATIO = 0.75;
 static constexpr size_t WINDOW_SIZE = 1024;
 
 static const ec::Float NEG(-1.0f);
-static const ec::Float innerLobesGain(-6.0206f); // = -20.0f * ec_log10(ec::Float(2.0f))
+static const ec::Float innerLobesGain(6.0206f); // = -20.0f * ec_log10(ec::Float(2.0f))
 static const ec::Float gainOffset(-24.1854f); // = 30.0f + innerLobesGain - 20.0f * ec_log10(ec::Float(WINDOW_SIZE))
-
 // Equivalent constants inside the log, such that they are included in the magnitude calculation
 static const ec::Float main_Fact(0.00381467300768291012202081353869f);
-// static const ec::Float side_Fact(0.24999961044173361218741013313016f);
 static const ec::Float side_Fact(0.00095366676588332382116783981164f);
-
-// .00095366676588332382116783981164472e-4
 
 void rfft(ec::StreamHw& streamHw);
 
@@ -66,7 +62,7 @@ std::vector<ec::Float> blackmanCoeffs =
   0.04260535375128485f, 0.04351307817195407f, 0.04443260127074758f, 0.04536399575904115f, 0.04630733424685606f,
   0.04726268922386219f, 0.04823013304033605f, 0.04920973788807647f, 0.050201575781281635f, 0.05120571853738985f,
   0.052222237757888645f, 0.05325120480909373f, 0.054292690802902256f, 0.055346766577523424f, 0.05641350267818888f,
-  0.05749296933784714f, 0.058585236457844934f, 0.05969037358859802f, 0.060808449910256274f, 0.061939534213364275f,
+  0.05749296933784714f, 0.058585236457844934f, 0.05969037358859802f, 0.060808449910256374f, 0.061939534213364275f,
   0.06308369487952278f, 0.06424099986205245f, 0.06541151666666441f, 0.06659531233214026f, 0.06779245341102494f,
   0.06900300595033572f, 0.07022703547229067f, 0.07146460695505966f, 0.07271578481354138f, 0.07398063288016929f,
   0.07525921438575028f, 0.07655159194033885f, 0.07785782751415016f, 0.07917798241851529f, 0.08051211728688186f,
@@ -215,14 +211,14 @@ std::vector<ec::Float> blackmanCoeffs =
   0.13456960468530196f, 0.1327301358136962f, 0.13090617404793703f, 0.12909769257296053f, 0.12730466329944576f,
   0.12552705687940727f, 0.12376484272193536f, 0.12201798900908535f, 0.12028646271190804f, 0.11857022960662511f,
   0.11686925429093765f, 0.11518350020047385f, 0.11351292962536695f, 0.11185750372696453f, 0.1102171825546607f,
-  0.10859192506285617f, 0.1069816891280366f, 0.10538643156596786f, 0.10380610814900725f, 0.10224067362352562f,
+  0.10859192506285617f, 0.1069816891280366f, 0.10538643156596786f, 0.10380610814900725f, 0.10224067362352563f,
   0.10069008172743915f, 0.09915428520784347f, 0.09763323583875433f, 0.09612688443894438f, 0.09463518088987827f,
   0.09315807415373892f, 0.0916955122915453f, 0.09024744248135746f, 0.08881381103656258f, 0.08739456342424534f,
   0.08598964428363305f, 0.0845989974446165f, 0.08322256594634041f, 0.0818602920558636f, 0.08051211728688193f,
   0.07917798241851534f, 0.07785782751415025f, 0.07655159194033878f, 0.07525921438575021f, 0.07398063288016925f,
   0.07271578481354157f, 0.07146460695505968f, 0.07022703547229074f, 0.06900300595033577f, 0.06779245341102502f,
   0.0665953123321402f, 0.06541151666666452f, 0.06424099986205262f, 0.06308369487952277f, 0.06193953421336431f,
-  0.06080844991025629f, 0.05969037358859808f, 0.05858523645784485f, 0.05749296933784727f, 0.05641350267818899f,
+  0.06080844991025639f, 0.05969037358859808f, 0.05858523645784485f, 0.05749296933784727f, 0.05641350267818899f,
   0.05534676657752352f, 0.05429269080290225f, 0.05325120480909373f, 0.05222223775788867f, 0.05120571853738977f,
   0.05020157578128167f, 0.0492097378880766f, 0.04823013304033618f, 0.04726268922386216f, 0.046307334246856055f,
   0.04536399575904118f, 0.04443260127074775f, 0.04351307817195409f, 0.04260535375128491f, 0.04170935521495829f,
@@ -442,7 +438,7 @@ std::vector<ec::Float> CC_Coeffs =
    0.9637760f,  0.9587030f,  0.9533060f,  0.94758600f,  0.9415440f,  0.9351840f,  0.92850600f,  0.9215140f,
    0.9142100f,  0.9065960f,  0.8986740f,  0.89044900f,  0.8819210f,  0.8730950f,  0.86397300f,  0.8545580f,
    0.8448540f,  0.8348630f,  0.8245890f,  0.81403600f,  0.8032080f,  0.7921070f,  0.78073700f,  0.7691030f,
-   0.7572090f,  0.7450580f,  0.7326540f,  0.72000300f, -0.7071070f,  0.7071070f
+   0.7572090f,  0.7450580f,  0.7326540f,  0.72000300f, -0.7071070f
 };
 
 std::vector<ec::Float> process_signal(const std::vector<ec::Float>& inputSignal)
@@ -459,7 +455,7 @@ std::vector<ec::Float> process_signal(const std::vector<ec::Float>& inputSignal)
   ec::StreamHw& streamHw = *ec::StreamHw::getSingletonStreamHw();
   streamHw.resetStreamHw();
   streamHw.copyToHw(inputSignal, 0, 768, 1024);             // Load first signal components
-  streamHw.copyToHw(CC_Coeffs, 0, 510, 2562);               // Load Complex  Exponential Coefficients
+  streamHw.copyToHw(CC_Coeffs, 0, 509, 2563);               // Load Complex  Exponential Coefficients
   streamHw.copyToHw(blackmanCoeffs, 0, WINDOW_SIZE, 3072);  // Load Window Coefficients
 
   streamHw.createFifos(212);
@@ -808,72 +804,72 @@ std::vector<ec::Float> process_signal(const std::vector<ec::Float>& inputSignal)
   streamHw.addOpMulToPipeline(130, 130, 130);
   streamHw.addOpMulToPipeline(131, 131, 131);
   streamHw.addOpAddToPipeline(130, 131, 131);
-  streamHw.addOpMulToPipeline(131, main_Fact, 131);
+  // streamHw.addOpMulToPipeline(131, main_Fact, 131);
   streamHw.addOpMulToPipeline(132, 132, 132);
   streamHw.addOpMulToPipeline(133, 133, 133);
   streamHw.addOpAddToPipeline(132, 133, 133);
-  streamHw.addOpMulToPipeline(133, main_Fact, 133);
+  // streamHw.addOpMulToPipeline(133, main_Fact, 133);
   streamHw.addOpMulToPipeline(134, 134, 134);
   streamHw.addOpMulToPipeline(135, 135, 135);
   streamHw.addOpAddToPipeline(134, 135, 135);
-  streamHw.addOpMulToPipeline(135, main_Fact, 135);
+  // streamHw.addOpMulToPipeline(135, main_Fact, 135);
   streamHw.addOpMulToPipeline(136, 136, 136);
   streamHw.addOpMulToPipeline(137, 137, 137);
   streamHw.addOpAddToPipeline(136, 137, 137);
-  streamHw.addOpMulToPipeline(137, main_Fact, 137);
+  // streamHw.addOpMulToPipeline(137, main_Fact, 137);
   streamHw.addOpMulToPipeline(138, 138, 138);
   streamHw.addOpMulToPipeline(139, 139, 139);
   streamHw.addOpAddToPipeline(138, 139, 139);
-  streamHw.addOpMulToPipeline(139, main_Fact, 139);
+  // streamHw.addOpMulToPipeline(139, main_Fact, 139);
   streamHw.addOpMulToPipeline(140, 140, 140);
   streamHw.addOpMulToPipeline(141, 141, 141);
   streamHw.addOpAddToPipeline(140, 141, 141);
-  streamHw.addOpMulToPipeline(141, main_Fact, 141);
+  // streamHw.addOpMulToPipeline(141, main_Fact, 141);
   streamHw.addOpMulToPipeline(142, 142, 142);
   streamHw.addOpMulToPipeline(143, 143, 143);
   streamHw.addOpAddToPipeline(142, 143, 143);
-  streamHw.addOpMulToPipeline(143, main_Fact, 143);
+  // streamHw.addOpMulToPipeline(143, main_Fact, 143);
   streamHw.addOpMulToPipeline(144, 144, 144);
   streamHw.addOpMulToPipeline(145, 145, 145);
   streamHw.addOpAddToPipeline(144, 145, 145);
-  streamHw.addOpMulToPipeline(145, main_Fact, 145);
+  // streamHw.addOpMulToPipeline(145, main_Fact, 145);
   streamHw.addOpMulToPipeline(146, 146, 146);
   streamHw.addOpMulToPipeline(147, 147, 147);
   streamHw.addOpAddToPipeline(146, 147, 147);
-  streamHw.addOpMulToPipeline(147, main_Fact, 147);
+  // streamHw.addOpMulToPipeline(147, main_Fact, 147);
   streamHw.addOpMulToPipeline(148, 148, 148);
   streamHw.addOpMulToPipeline(149, 149, 149);
   streamHw.addOpAddToPipeline(148, 149, 149);
-  streamHw.addOpMulToPipeline(149, main_Fact, 149);
+  // streamHw.addOpMulToPipeline(149, main_Fact, 149);
   streamHw.addOpMulToPipeline(150, 150, 150);
   streamHw.addOpMulToPipeline(151, 151, 151);
   streamHw.addOpAddToPipeline(150, 151, 151);
-  streamHw.addOpMulToPipeline(151, main_Fact, 151);
+  // streamHw.addOpMulToPipeline(151, main_Fact, 151);
   streamHw.addOpMulToPipeline(152, 152, 152);
   streamHw.addOpMulToPipeline(153, 153, 153);
   streamHw.addOpAddToPipeline(152, 153, 153);
-  streamHw.addOpMulToPipeline(153, main_Fact, 153);
+  // streamHw.addOpMulToPipeline(153, main_Fact, 153);
   streamHw.addOpMulToPipeline(154, 154, 154);
   streamHw.addOpMulToPipeline(155, 155, 155);
   streamHw.addOpAddToPipeline(154, 155, 155);
-  streamHw.addOpMulToPipeline(155, main_Fact, 155);
+  // streamHw.addOpMulToPipeline(155, main_Fact, 155);
   streamHw.addOpMulToPipeline(156, 156, 156);
   streamHw.addOpMulToPipeline(157, 157, 157);
   streamHw.addOpAddToPipeline(156, 157, 157);
-  streamHw.addOpMulToPipeline(157, main_Fact, 157);
+  // streamHw.addOpMulToPipeline(157, main_Fact, 157);
   streamHw.addOpMulToPipeline(158, 158, 158);
   streamHw.addOpMulToPipeline(159, 159, 159);
   streamHw.addOpAddToPipeline(158, 159, 159);
-  streamHw.addOpMulToPipeline(159, main_Fact, 159);
+  // streamHw.addOpMulToPipeline(159, main_Fact, 159);
   streamHw.addOpMulToPipeline(160, 160, 160);
   streamHw.addOpMulToPipeline(161, 161, 161);
   streamHw.addOpAddToPipeline(160, 161, 161);
-  streamHw.addOpMulToPipeline(161, main_Fact, 161);
+  // streamHw.addOpMulToPipeline(161, main_Fact, 161);
 
   streamHw.addOpMulToPipeline(162, 162, 162);
-  streamHw.addOpMulToPipeline(162, side_Fact, 162);
+  // streamHw.addOpMulToPipeline(162, side_Fact, 162);
   streamHw.addOpMulToPipeline(163, 163, 163);
-  streamHw.addOpMulToPipeline(163, side_Fact, 163);
+  // streamHw.addOpMulToPipeline(163, side_Fact, 163);
   // Additions needed for K=1
   streamHw.addOpAddToPipeline(166, 167, 167);
   streamHw.addOpAddToPipeline(168, 169, 169);
@@ -941,10 +937,18 @@ std::vector<ec::Float> process_signal(const std::vector<ec::Float>& inputSignal)
 
   // TODO: Calculate the log as an approximation via mults & adds. Potential saves: 15,903
   // Output in dBs
-  for (size_t I = 0; I < sizeSpectrum; I++) // 513 - Cost: 15,903
+  // for (size_t I = 0; I < sizeSpectrum; I++) // 513 - Cost: 15,903
+  // {
+  //   outputSpectrum[I] = 4.34294f * ec_log(outputSpectrum[I]); // = 10.0f * ec_log(ec::Float(10.0f));
+  // }
+
+  for (size_t I = 0; I < sizeSpectrum; I++) // 513 - Cost: 17,442
   {
-    outputSpectrum[I] = 4.34294f * ec_log(outputSpectrum[I]); // = 10.0f * ec_log(ec::Float(10.0f));
+    outputSpectrum[I] = 4.34294f * ec_log(outputSpectrum[I]) + gainOffset; // = 10.0f * ec_log(ec::Float(10.0f));
   }
+  
+  outputSpectrum[0] -= innerLobesGain;
+  outputSpectrum[sizeSpectrum - 1] -= innerLobesGain;
 
   return outputSpectrum;
 }
@@ -966,13 +970,8 @@ void rfft(ec::StreamHw& streamHw)
   int I_CC1, I_CC3, I_SS1, I_SS3;
   int I, I0, I1, I2, I3, I4, I5, I6, I7, I8, IS, ID;
   int J, K, N2;
-
-  std::vector<ec::Float> tmpSignal(WINDOW_SIZE);
-  std::vector<ec::Float> testSignal(WINDOW_SIZE);
-  std::vector<ec::Float> memBackup(WINDOW_SIZE);
   
-  int I_SQRT1_2 = 3071;
-  int I_NEG_SQRT1_2 = 3070;
+  int I_NEG_SQRT1_2 = 3071;
 
   int N = 1024;
   int M = 10;
@@ -1030,10 +1029,10 @@ void rfft(ec::StreamHw& streamHw)
         streamHw.startStreamDataMemToFifo(I_NEG_SQRT1_2, 3, 1); // NEG_SQRT1_2 
         streamHw.startStreamDataMemToFifo(I1, 7, 1); // X[I1]
 
-        streamHw.startStreamDataMemToFifo(I3, 8, 1); // X[I3]
-        streamHw.startStreamDataMemToFifo(I_SQRT1_2, 9, 1); // SQRT1_2
-        streamHw.startStreamDataMemToFifo(I5, 10, 1); // X[I5]
-        streamHw.startStreamDataMemToFifo(I_SQRT1_2, 11, 1); // SQRT1_2
+        streamHw.startStreamDataMemToFifo(I5, 8, 1); // X[I3]
+        streamHw.startStreamDataMemToFifo(I_NEG_SQRT1_2, 9, 1); // SQRT1_2
+        streamHw.startStreamDataMemToFifo(I3, 10, 1); // X[I5]
+        streamHw.startStreamDataMemToFifo(I_NEG_SQRT1_2, 11, 1); // SQRT1_2
         streamHw.startStreamDataMemToFifo(I+N2/8, 13, 1); // X[I+N2/8]
 
         streamHw.startStreamDataMemToFifo(I1, 19, 1); // X[I1]
@@ -1043,10 +1042,10 @@ void rfft(ec::StreamHw& streamHw)
         streamHw.startStreamDataMemToFifo(I_NEG_SQRT1_2, 23, 1); // NEG_SQRT1_2 
 
         streamHw.startStreamDataMemToFifo(I+N2/8, 25, 1); // X[I+N2/8]  
-        streamHw.startStreamDataMemToFifo(I3, 28, 1); // X[I3]
-        streamHw.startStreamDataMemToFifo(I_SQRT1_2, 29, 1); // SQRT1_2
-        streamHw.startStreamDataMemToFifo(I5, 30, 1); // X[I5]
-        streamHw.startStreamDataMemToFifo(I_SQRT1_2, 31, 1); // SQRT1_2
+        streamHw.startStreamDataMemToFifo(I5, 28, 1); // X[I3]
+        streamHw.startStreamDataMemToFifo(I_NEG_SQRT1_2, 29, 1); // SQRT1_2
+        streamHw.startStreamDataMemToFifo(I3, 30, 1); // X[I5]
+        streamHw.startStreamDataMemToFifo(I_NEG_SQRT1_2, 31, 1); // SQRT1_2
         
 
         streamHw.startStreamDataFifoToMem(7, I5, 1); // X[I5]
@@ -1061,7 +1060,7 @@ void rfft(ec::StreamHw& streamHw)
 
     for (J = 1; J <= N2/8 - 1; J++) {
 
-      I_CC1 = J*(WINDOW_SIZE>>K) - 1 + 2562;
+      I_CC1 = J*(WINDOW_SIZE>>K) - 1 + 2563;
       I_CC3 = I_CC1 + 127;
       I_SS1 = I_CC3 + 127;
       I_SS3 = I_SS1 + 127;
@@ -3706,7 +3705,7 @@ void fft_4_Streamed(ec::StreamHw& streamHw)
 {
   int IS = 1024;
   int IE = 1056;
-  int IC = 2562;
+  int IC = 2563;
   int ID;
 
   for (size_t I = 0; I < idx_k4.size(); I++)
@@ -3859,7 +3858,7 @@ void fft_5_Streamed(ec::StreamHw& streamHw)
 {
   int IS = 1024;
   int IE = 1056;
-  int IC = 2562;
+  int IC = 2563;
   int ID;
   for (size_t I = 0; I < idx_k5.size(); I++)
   {
@@ -4078,7 +4077,7 @@ void fft_7_Streamed(ec::StreamHw& streamHw)
 {
   int IS = 1024;
   int IE = 1100;
-  int IC = 2562;
+  int IC = 2563;
   int ID;
   for (size_t I = 1; I < 16; I++)
   {
@@ -4707,7 +4706,7 @@ void fft_8_Streamed(ec::StreamHw& streamHw)
 {
   int IS = 1024;
   int IE = 1100;
-  int IC = 2562;
+  int IC = 2563;
   int ID;
   for (size_t I = 1; I < 16; I++)
   {
@@ -5245,7 +5244,7 @@ void fft_9_Streamed(ec::StreamHw& streamHw)
 {
   int IS = 1024;
   int IE = 1056;
-  int IC = 2562;
+  int IC = 2563;
   int ID;
   for (size_t I = 1; I < 32; I++)
   {
@@ -5566,7 +5565,7 @@ void fft_10_Streamed(ec::StreamHw& streamHw)
 {
   int IS = 1024;
   int IE = 1056;
-  int IC = 2562;
+  int IC = 2563;
   int ID;
   for (size_t ID = 1; ID < 64; ID++)
   {
