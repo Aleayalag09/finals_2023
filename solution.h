@@ -33,6 +33,7 @@ void fft_3_Streamed(ec::StreamHw& streamHw);
 void fft_4_Streamed(ec::StreamHw& streamHw);
 void fft_5_Streamed(ec::StreamHw& streamHw);
 
+void fft_7_Streamed(ec::StreamHw& streamHw);
 void fft_8_Streamed(ec::StreamHw& streamHw);
 void fft_9_Streamed(ec::StreamHw& streamHw);
 void fft_10_Streamed(ec::StreamHw& streamHw);
@@ -453,8 +454,6 @@ std::vector<ec::Float> process_signal(const std::vector<ec::Float>& inputSignal)
 
   std::vector<ec::Float> signalWindow(sizeSpectrum);
   std::vector<ec::Float> outputSpectrum(sizeSpectrum);
-  // This costs us assignments
-  // std::vector<ec::Float> outputSpectrum(sizeSpectrum, std::numeric_limits<float>::lowest());
 
   // Init StreamHw
   ec::StreamHw& streamHw = *ec::StreamHw::getSingletonStreamHw();
@@ -947,11 +946,6 @@ std::vector<ec::Float> process_signal(const std::vector<ec::Float>& inputSignal)
     outputSpectrum[I] = 4.34294f * ec_log(outputSpectrum[I]); // = 10.0f * ec_log(ec::Float(10.0f));
   }
 
-  // for (size_t I = 0; I < sizeSpectrum; I++)
-  // {
-  //   std::cout << I << ": " << outputSpectrum[I].m_value << std::endl;
-  // }
-
   return outputSpectrum;
 }
 
@@ -994,18 +988,8 @@ void rfft(ec::StreamHw& streamHw)
 
   // L-Shaped Butterflies
   N2 = 32;
-  for (K = 6; K < M-2; K++) {
+  for (K = 6; K < M-3; K++) {
     N2 *= 2;   // Depth indicator 4 - 1024
-
-    // if (K==8)
-    // {
-    //   streamHw.copyFromHw(memBackup, 0, 1024, 0);
-
-    //   fft_8_Streamed(streamHw);
-    //   streamHw.copyFromHw(testSignal, 0, 1024, 0);
-
-    //   streamHw.copyToHw(memBackup, 0, 1024, 0);
-    // }
 
     IS = 0;
     ID = N2 * 2;
@@ -1177,20 +1161,8 @@ void rfft(ec::StreamHw& streamHw)
       }
     }
   }
-  
-  // streamHw.copyFromHw(tmpSignal, 0, 1024, 0);
-  // int count = 0;
-  // for (size_t I = 0; I < WINDOW_SIZE; I++)
-  // {
-  //   if (ec_abs(tmpSignal[I] - testSignal[I]) > 0.00005f)
-  //   {
-  //     std::cout << I << ": " << tmpSignal[I].m_value << "\t" << testSignal[I].m_value << std::endl;
-  //     count ++;
-  //   }
-  // }
 
-  // std::cout << count << std::endl;
-
+  fft_7_Streamed(streamHw);
   fft_8_Streamed(streamHw);
   fft_9_Streamed(streamHw);
   fft_10_Streamed(streamHw);
@@ -2994,22 +2966,22 @@ void fft_3_Streamed(ec::StreamHw& streamHw)
     streamHw.startStreamDataMemToFifo(IS+94, 210, 1);
     streamHw.startStreamDataMemToFifo(IS+92, 211, 1);
 
-    streamHw.startStreamDataFifoToMem(123,    IE, 32);
-    streamHw.startStreamDataFifoToMem(85,   IE+1, 32);
-    streamHw.startStreamDataFifoToMem(187,  IE+2, 32);
-    streamHw.startStreamDataFifoToMem(73,   IE+3, 32);
-    streamHw.startStreamDataFifoToMem(189,  IE+4, 32);
-    streamHw.startStreamDataFifoToMem(201,  IE+5, 32);
-    streamHw.startStreamDataFifoToMem(191,  IE+6, 32);
-    streamHw.startStreamDataFifoToMem(203,  IE+7, 32);
-    streamHw.startStreamDataFifoToMem(193,  IE+8, 32);
-    streamHw.startStreamDataFifoToMem(205,  IE+9, 32);
-    streamHw.startStreamDataFifoToMem(195, IE+10, 32);
-    streamHw.startStreamDataFifoToMem(207, IE+11, 32);
-    streamHw.startStreamDataFifoToMem(197, IE+12, 32);
-    streamHw.startStreamDataFifoToMem(209, IE+13, 32);
-    streamHw.startStreamDataFifoToMem(199, IE+14, 32);
-    streamHw.startStreamDataFifoToMem(211, IE+15, 32);
+    streamHw.startStreamDataFifoToMem(123,    IE, 1);
+    streamHw.startStreamDataFifoToMem(85,   IE+1, 1);
+    streamHw.startStreamDataFifoToMem(187,  IE+2, 1);
+    streamHw.startStreamDataFifoToMem(73,   IE+3, 1);
+    streamHw.startStreamDataFifoToMem(189,  IE+4, 1);
+    streamHw.startStreamDataFifoToMem(201,  IE+5, 1);
+    streamHw.startStreamDataFifoToMem(191,  IE+6, 1);
+    streamHw.startStreamDataFifoToMem(203,  IE+7, 1);
+    streamHw.startStreamDataFifoToMem(193,  IE+8, 1);
+    streamHw.startStreamDataFifoToMem(205,  IE+9, 1);
+    streamHw.startStreamDataFifoToMem(195, IE+10, 1);
+    streamHw.startStreamDataFifoToMem(207, IE+11, 1);
+    streamHw.startStreamDataFifoToMem(197, IE+12, 1);
+    streamHw.startStreamDataFifoToMem(209, IE+13, 1);
+    streamHw.startStreamDataFifoToMem(199, IE+14, 1);
+    streamHw.startStreamDataFifoToMem(211, IE+15, 1);
     streamHw.runPipeline();
 
     // Second pipeline Adds - X[I]: 3 Terms
@@ -4102,6 +4074,635 @@ void fft_5_Streamed(ec::StreamHw& streamHw)
   }
 }
 
+void fft_7_Streamed(ec::StreamHw& streamHw)
+{
+  int IS = 1024;
+  int IE = 1100;
+  int IC = 2562;
+  int ID;
+  for (size_t I = 1; I < 16; I++)
+  {
+    ID = 8*I;
+    // Save values in the available memory space
+    streamHw.startStreamDataMemToFifo(I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(32-I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+1, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(32+I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+2, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(64-I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+3, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(768+I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+4, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(800-I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+5, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(800+I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+6, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(832-I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+7, 1);
+    streamHw.runPipeline();
+
+    // First Pipeline -> TX 0 - 7
+    streamHw.startStreamDataMemToFifo(IC+253+ID,  0, 1);
+    streamHw.startStreamDataMemToFifo(96-I,       1, 1);
+    streamHw.startStreamDataMemToFifo(IC+ID-1,    2, 1);
+    streamHw.startStreamDataMemToFifo(64+I,       3, 1);
+    streamHw.startStreamDataMemToFifo(IC+126+ID, 20, 1);
+    streamHw.startStreamDataMemToFifo(96+I,      21, 1);
+    streamHw.startStreamDataMemToFifo(IC+380+ID, 22, 1);
+    streamHw.startStreamDataMemToFifo(128-I,     23, 1);
+    streamHw.startStreamDataMemToFifo(IC+ID-1,    8, 1);
+    streamHw.startStreamDataMemToFifo(96-I,       9, 1);
+    streamHw.startStreamDataMemToFifo(IC+253+ID, 10, 1);
+    streamHw.startStreamDataMemToFifo(64+I,      11, 1);
+    streamHw.startStreamDataMemToFifo(IC+126+ID, 24, 1);
+    streamHw.startStreamDataMemToFifo(128-I,     25, 1);
+    streamHw.startStreamDataMemToFifo(IC+380+ID, 26, 1);
+    streamHw.startStreamDataMemToFifo(96+I,      27, 1);
+    streamHw.startStreamDataMemToFifo(IC+253+ID, 34, 1);
+    streamHw.startStreamDataMemToFifo(864-I,     35, 1);
+    streamHw.startStreamDataMemToFifo(IC+ID-1,   36, 1);
+    streamHw.startStreamDataMemToFifo(832+I,     37, 1);
+    streamHw.startStreamDataMemToFifo(IC+126+ID, 46, 1);
+    streamHw.startStreamDataMemToFifo(864+I,     47, 1);
+    streamHw.startStreamDataMemToFifo(IC+380+ID, 48, 1);
+    streamHw.startStreamDataMemToFifo(896-I,     49, 1);
+    streamHw.startStreamDataMemToFifo(IC+ID-1,   56, 1);
+    streamHw.startStreamDataMemToFifo(864-I,     57, 1);
+    streamHw.startStreamDataMemToFifo(IC+253+ID, 64, 1);
+    streamHw.startStreamDataMemToFifo(832+I,     65, 1);
+    streamHw.startStreamDataMemToFifo(IC+126+ID, 74, 1);
+    streamHw.startStreamDataMemToFifo(896-I,     75, 1);
+    streamHw.startStreamDataMemToFifo(IC+380+ID, 76, 1);
+    streamHw.startStreamDataMemToFifo(864+I,     77, 1);
+
+    streamHw.startStreamDataFifoToMem(3,    IE, 1); // T0
+    streamHw.startStreamDataFifoToMem(23, IE+1, 1); // T1
+    streamHw.startStreamDataFifoToMem(11, IE+2, 1); // T2
+    streamHw.startStreamDataFifoToMem(25, IE+3, 1); // T3
+    streamHw.startStreamDataFifoToMem(37, IE+4, 1); // T4
+    streamHw.startStreamDataFifoToMem(49, IE+5, 1); // T5
+    streamHw.startStreamDataFifoToMem(65, IE+6, 1); // T6
+    streamHw.startStreamDataFifoToMem(77, IE+7, 1); // T7
+    streamHw.runPipeline();
+
+    // Third Pipeline -> TX 8 - 15
+    streamHw.startStreamDataMemToFifo(IE+1, 166, 1);
+    streamHw.startStreamDataMemToFifo(IE,   167, 1);
+    streamHw.startStreamDataMemToFifo(IE+1, 179, 1);
+    streamHw.startStreamDataMemToFifo(IE,   178, 1);
+    streamHw.startStreamDataMemToFifo(IE+2, 168, 1);
+    streamHw.startStreamDataMemToFifo(IE+3, 169, 1);
+    streamHw.startStreamDataMemToFifo(IE+2, 181, 1);
+    streamHw.startStreamDataMemToFifo(IE+3, 180, 1);
+    streamHw.startStreamDataMemToFifo(IE+5, 170, 1);
+    streamHw.startStreamDataMemToFifo(IE+4, 171, 1);
+    streamHw.startStreamDataMemToFifo(IE+5, 183, 1);
+    streamHw.startStreamDataMemToFifo(IE+4, 182, 1);
+    streamHw.startStreamDataMemToFifo(IE+6, 172, 1);
+    streamHw.startStreamDataMemToFifo(IE+7, 173, 1);
+    streamHw.startStreamDataMemToFifo(IE+6, 185, 1);
+    streamHw.startStreamDataMemToFifo(IE+7, 184, 1);
+
+    streamHw.startStreamDataFifoToMem(167,  IE+8, 1); // T8
+    streamHw.startStreamDataFifoToMem(179,  IE+9, 1); // T9
+    streamHw.startStreamDataFifoToMem(169, IE+10, 1); // T10
+    streamHw.startStreamDataFifoToMem(181, IE+11, 1); // T11
+    streamHw.startStreamDataFifoToMem(171, IE+12, 1); // T12
+    streamHw.startStreamDataFifoToMem(183, IE+13, 1); // T13
+    streamHw.startStreamDataFifoToMem(173, IE+14, 1); // T14
+    streamHw.startStreamDataFifoToMem(185, IE+15, 1); // T15
+    streamHw.runPipeline();
+
+    // Fourth Pipeline -> X[ID]
+    streamHw.startStreamDataMemToFifo(IS,      1, 1);
+    streamHw.startStreamDataMemToFifo(IE+8,    3, 1);
+    streamHw.startStreamDataMemToFifo(IS,      9, 1);
+    streamHw.startStreamDataMemToFifo(IE+8,   11, 1);
+    streamHw.startStreamDataMemToFifo(IE+9,   35, 1);
+    streamHw.startStreamDataMemToFifo(IS+2,   37, 1);
+    streamHw.startStreamDataMemToFifo(IE+9,   31, 1);
+    streamHw.startStreamDataMemToFifo(IS+2,   29, 1);
+    streamHw.startStreamDataMemToFifo(IE+10, 172, 1);
+    streamHw.startStreamDataMemToFifo(IS+3,  173, 1);
+    streamHw.startStreamDataMemToFifo(IE+10,  57, 1);
+    streamHw.startStreamDataMemToFifo(IS+3,   65, 1);
+    streamHw.startStreamDataMemToFifo(IS+1,   43, 1);
+    streamHw.startStreamDataMemToFifo(IE+11,  45, 1);
+    streamHw.startStreamDataMemToFifo(IS+1,   75, 1);
+    streamHw.startStreamDataMemToFifo(IE+11,  77, 1);
+    streamHw.startStreamDataMemToFifo(IS+4,   67, 1);
+    streamHw.startStreamDataMemToFifo(IE+12,  69, 1);
+    streamHw.startStreamDataMemToFifo(IS+4,   87, 1);
+    streamHw.startStreamDataMemToFifo(IE+12,  89, 1);
+    streamHw.startStreamDataMemToFifo(IE+13, 168, 1);
+    streamHw.startStreamDataMemToFifo(IS+6,  169, 1);
+    streamHw.startStreamDataMemToFifo(IE+13, 181, 1);
+    streamHw.startStreamDataMemToFifo(IS+6,  180, 1);
+    streamHw.startStreamDataMemToFifo(IS+5,  170, 1);
+    streamHw.startStreamDataMemToFifo(IE+15, 171, 1);
+    streamHw.startStreamDataMemToFifo(IS+5,  183, 1);
+    streamHw.startStreamDataMemToFifo(IE+15, 182, 1);
+    streamHw.startStreamDataMemToFifo(IE+14,  95, 1);
+    streamHw.startStreamDataMemToFifo(IS+7,   97, 1);
+    streamHw.startStreamDataMemToFifo(IE+14, 185, 1);
+    streamHw.startStreamDataMemToFifo(IS+7,  184, 1);
+
+    streamHw.startStreamDataFifoToMem(3,       I, 1); // X[I]
+    streamHw.startStreamDataFifoToMem(11,   64-I, 1); // X[128-I]
+    streamHw.startStreamDataFifoToMem(37,   96+I, 1); // X[32-I]
+    streamHw.startStreamDataFifoToMem(31,   96-I, 1); // X[96+I]
+    streamHw.startStreamDataFifoToMem(173, 128-I, 1); // X[128-I]
+    streamHw.startStreamDataFifoToMem(65,   64+I, 1); // X[64+I]
+    streamHw.startStreamDataFifoToMem(45,   32+I, 1); // X[32+I]
+    streamHw.startStreamDataFifoToMem(77,   32-I, 1); // X[32-I]
+    streamHw.startStreamDataFifoToMem(69,  768+I, 1); // X[768+I]
+    streamHw.startStreamDataFifoToMem(89,  832-I, 1); // X[832-I]
+    streamHw.startStreamDataFifoToMem(169, 864+I, 1); // X[864+I]
+    streamHw.startStreamDataFifoToMem(181, 864-I, 1); // X[864-I]
+    streamHw.startStreamDataFifoToMem(171, 800+I, 1); // X[800+I]
+    streamHw.startStreamDataFifoToMem(183, 800-I, 1); // X[800-I]
+    streamHw.startStreamDataFifoToMem(97,  896-I, 1); // X[896-I]
+    streamHw.startStreamDataFifoToMem(185, 832+I, 1); // X[832+I]
+    streamHw.runPipeline();
+  }
+  
+  for (size_t I = 1; I < 16; I++)
+  {
+    ID = 8*I;
+    // Save values in the available memory space
+    streamHw.startStreamDataMemToFifo(I+256, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(288-I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+1, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(288+I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+2, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(320-I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+3, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(384+I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+4, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(416-I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+5, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(416+I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+6, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(448-I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+7, 1);
+    streamHw.runPipeline();
+
+    // First Pipeline -> TX 0 - 7
+    streamHw.startStreamDataMemToFifo(IC+253+ID,  0, 1);
+    streamHw.startStreamDataMemToFifo(352-I,      1, 1);
+    streamHw.startStreamDataMemToFifo(IC+ID-1,    2, 1);
+    streamHw.startStreamDataMemToFifo(320+I,      3, 1);
+    streamHw.startStreamDataMemToFifo(IC+126+ID, 20, 1);
+    streamHw.startStreamDataMemToFifo(352+I,     21, 1);
+    streamHw.startStreamDataMemToFifo(IC+380+ID, 22, 1);
+    streamHw.startStreamDataMemToFifo(384-I,     23, 1);
+    streamHw.startStreamDataMemToFifo(IC+ID-1,    8, 1);
+    streamHw.startStreamDataMemToFifo(352-I,      9, 1);
+    streamHw.startStreamDataMemToFifo(IC+253+ID, 10, 1);
+    streamHw.startStreamDataMemToFifo(320+I,     11, 1);
+    streamHw.startStreamDataMemToFifo(IC+126+ID, 24, 1);
+    streamHw.startStreamDataMemToFifo(384-I,     25, 1);
+    streamHw.startStreamDataMemToFifo(IC+380+ID, 26, 1);
+    streamHw.startStreamDataMemToFifo(352+I,     27, 1);
+    streamHw.startStreamDataMemToFifo(IC+253+ID, 34, 1);
+    streamHw.startStreamDataMemToFifo(480-I,     35, 1);
+    streamHw.startStreamDataMemToFifo(IC+ID-1,   36, 1);
+    streamHw.startStreamDataMemToFifo(448+I,     37, 1);
+    streamHw.startStreamDataMemToFifo(IC+126+ID, 46, 1);
+    streamHw.startStreamDataMemToFifo(480+I,     47, 1);
+    streamHw.startStreamDataMemToFifo(IC+380+ID, 48, 1);
+    streamHw.startStreamDataMemToFifo(512-I,     49, 1);
+    streamHw.startStreamDataMemToFifo(IC+ID-1,   56, 1);
+    streamHw.startStreamDataMemToFifo(480-I,     57, 1);
+    streamHw.startStreamDataMemToFifo(IC+253+ID, 64, 1);
+    streamHw.startStreamDataMemToFifo(448+I,     65, 1);
+    streamHw.startStreamDataMemToFifo(IC+126+ID, 74, 1);
+    streamHw.startStreamDataMemToFifo(512-I,     75, 1);
+    streamHw.startStreamDataMemToFifo(IC+380+ID, 76, 1);
+    streamHw.startStreamDataMemToFifo(480+I,     77, 1);
+
+    streamHw.startStreamDataFifoToMem(3,    IE, 1); // T0
+    streamHw.startStreamDataFifoToMem(23, IE+1, 1); // T1
+    streamHw.startStreamDataFifoToMem(11, IE+2, 1); // T2
+    streamHw.startStreamDataFifoToMem(25, IE+3, 1); // T3
+    streamHw.startStreamDataFifoToMem(37, IE+4, 1); // T4
+    streamHw.startStreamDataFifoToMem(49, IE+5, 1); // T5
+    streamHw.startStreamDataFifoToMem(65, IE+6, 1); // T6
+    streamHw.startStreamDataFifoToMem(77, IE+7, 1); // T7
+    streamHw.runPipeline();
+
+    // Third Pipeline -> TX 8 - 15
+    streamHw.startStreamDataMemToFifo(IE+1, 166, 1);
+    streamHw.startStreamDataMemToFifo(IE,   167, 1);
+    streamHw.startStreamDataMemToFifo(IE+1, 179, 1);
+    streamHw.startStreamDataMemToFifo(IE,   178, 1);
+    streamHw.startStreamDataMemToFifo(IE+2, 168, 1);
+    streamHw.startStreamDataMemToFifo(IE+3, 169, 1);
+    streamHw.startStreamDataMemToFifo(IE+2, 181, 1);
+    streamHw.startStreamDataMemToFifo(IE+3, 180, 1);
+    streamHw.startStreamDataMemToFifo(IE+5, 170, 1);
+    streamHw.startStreamDataMemToFifo(IE+4, 171, 1);
+    streamHw.startStreamDataMemToFifo(IE+5, 183, 1);
+    streamHw.startStreamDataMemToFifo(IE+4, 182, 1);
+    streamHw.startStreamDataMemToFifo(IE+6, 172, 1);
+    streamHw.startStreamDataMemToFifo(IE+7, 173, 1);
+    streamHw.startStreamDataMemToFifo(IE+6, 185, 1);
+    streamHw.startStreamDataMemToFifo(IE+7, 184, 1);
+
+    streamHw.startStreamDataFifoToMem(167,  IE+8, 1); // T8
+    streamHw.startStreamDataFifoToMem(179,  IE+9, 1); // T9
+    streamHw.startStreamDataFifoToMem(169, IE+10, 1); // T10
+    streamHw.startStreamDataFifoToMem(181, IE+11, 1); // T11
+    streamHw.startStreamDataFifoToMem(171, IE+12, 1); // T12
+    streamHw.startStreamDataFifoToMem(183, IE+13, 1); // T13
+    streamHw.startStreamDataFifoToMem(173, IE+14, 1); // T14
+    streamHw.startStreamDataFifoToMem(185, IE+15, 1); // T15
+    streamHw.runPipeline();
+
+    // Fourth Pipeline -> X[ID]
+    streamHw.startStreamDataMemToFifo(IS,      1, 1);
+    streamHw.startStreamDataMemToFifo(IE+8,    3, 1);
+    streamHw.startStreamDataMemToFifo(IS,      9, 1);
+    streamHw.startStreamDataMemToFifo(IE+8,   11, 1);
+    streamHw.startStreamDataMemToFifo(IE+9,   35, 1);
+    streamHw.startStreamDataMemToFifo(IS+2,   37, 1);
+    streamHw.startStreamDataMemToFifo(IE+9,   31, 1);
+    streamHw.startStreamDataMemToFifo(IS+2,   29, 1);
+    streamHw.startStreamDataMemToFifo(IE+10, 172, 1);
+    streamHw.startStreamDataMemToFifo(IS+3,  173, 1);
+    streamHw.startStreamDataMemToFifo(IE+10,  57, 1);
+    streamHw.startStreamDataMemToFifo(IS+3,   65, 1);
+    streamHw.startStreamDataMemToFifo(IS+1,   43, 1);
+    streamHw.startStreamDataMemToFifo(IE+11,  45, 1);
+    streamHw.startStreamDataMemToFifo(IS+1,   75, 1);
+    streamHw.startStreamDataMemToFifo(IE+11,  77, 1);
+    streamHw.startStreamDataMemToFifo(IS+4,   67, 1);
+    streamHw.startStreamDataMemToFifo(IE+12,  69, 1);
+    streamHw.startStreamDataMemToFifo(IS+4,   87, 1);
+    streamHw.startStreamDataMemToFifo(IE+12,  89, 1);
+    streamHw.startStreamDataMemToFifo(IE+13, 168, 1);
+    streamHw.startStreamDataMemToFifo(IS+6,  169, 1);
+    streamHw.startStreamDataMemToFifo(IE+13, 181, 1);
+    streamHw.startStreamDataMemToFifo(IS+6,  180, 1);
+    streamHw.startStreamDataMemToFifo(IE+14, 170, 1);
+    streamHw.startStreamDataMemToFifo(IS+7,  171, 1);
+    streamHw.startStreamDataMemToFifo(IE+14, 183, 1);
+    streamHw.startStreamDataMemToFifo(IS+7,  182, 1);
+    streamHw.startStreamDataMemToFifo(IS+5,   95, 1);
+    streamHw.startStreamDataMemToFifo(IE+15,  97, 1);
+    streamHw.startStreamDataMemToFifo(IS+5,  185, 1);
+    streamHw.startStreamDataMemToFifo(IE+15, 184, 1);
+
+    streamHw.startStreamDataFifoToMem(3,   256+I, 1);
+    streamHw.startStreamDataFifoToMem(11,  320-I, 1);
+    streamHw.startStreamDataFifoToMem(37,  352+I, 1);
+    streamHw.startStreamDataFifoToMem(31,  352-I, 1);
+    streamHw.startStreamDataFifoToMem(173, 384-I, 1);
+    streamHw.startStreamDataFifoToMem(65,  320+I, 1);
+    streamHw.startStreamDataFifoToMem(45,  288+I, 1);
+    streamHw.startStreamDataFifoToMem(77,  288-I, 1);
+    streamHw.startStreamDataFifoToMem(69,  384+I, 1);
+    streamHw.startStreamDataFifoToMem(89,  448-I, 1);
+    streamHw.startStreamDataFifoToMem(169, 480+I, 1);
+    streamHw.startStreamDataFifoToMem(181, 480-I, 1);
+    streamHw.startStreamDataFifoToMem(171, 512-I, 1);
+    streamHw.startStreamDataFifoToMem(183, 448+I, 1);
+    streamHw.startStreamDataFifoToMem(97,  416+I, 1);
+    streamHw.startStreamDataFifoToMem(185, 416-I, 1);
+    streamHw.runPipeline();
+  }
+  
+  for (size_t I = 1; I < 16; I++)
+  {
+    ID = 8*I;
+    // Save values in the available memory space
+    streamHw.startStreamDataMemToFifo(I+512, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(544-I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+1, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(544+I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+2, 1);
+    streamHw.runPipeline();
+    streamHw.startStreamDataMemToFifo(576-I, 32, 1);
+    streamHw.startStreamDataFifoToMem(32, IS+3, 1);
+    streamHw.runPipeline();
+
+    // First Pipeline -> TX 0 - 7
+    streamHw.startStreamDataMemToFifo(IC+253+ID,  0, 1);
+    streamHw.startStreamDataMemToFifo(608-I,      1, 1);
+    streamHw.startStreamDataMemToFifo(IC+ID-1,    2, 1);
+    streamHw.startStreamDataMemToFifo(576+I,      3, 1);
+    streamHw.startStreamDataMemToFifo(IC+126+ID, 20, 1);
+    streamHw.startStreamDataMemToFifo(608+I,     21, 1);
+    streamHw.startStreamDataMemToFifo(IC+380+ID, 22, 1);
+    streamHw.startStreamDataMemToFifo(640-I,     23, 1);
+    streamHw.startStreamDataMemToFifo(IC+ID-1,    8, 1);
+    streamHw.startStreamDataMemToFifo(608-I,      9, 1);
+    streamHw.startStreamDataMemToFifo(IC+253+ID, 10, 1);
+    streamHw.startStreamDataMemToFifo(576+I,     11, 1);
+    streamHw.startStreamDataMemToFifo(IC+126+ID, 24, 1);
+    streamHw.startStreamDataMemToFifo(640-I,     25, 1);
+    streamHw.startStreamDataMemToFifo(IC+380+ID, 26, 1);
+    streamHw.startStreamDataMemToFifo(608+I,     27, 1);
+
+    streamHw.startStreamDataFifoToMem(3,    IE, 1); // T0
+    streamHw.startStreamDataFifoToMem(23, IE+1, 1); // T1
+    streamHw.startStreamDataFifoToMem(11, IE+2, 1); // T2
+    streamHw.startStreamDataFifoToMem(25, IE+3, 1); // T3
+    streamHw.runPipeline();
+
+    // Third Pipeline -> TX 8 - 15
+    streamHw.startStreamDataMemToFifo(IE+1, 166, 1);
+    streamHw.startStreamDataMemToFifo(IE,   167, 1);
+    streamHw.startStreamDataMemToFifo(IE+1, 179, 1);
+    streamHw.startStreamDataMemToFifo(IE,   178, 1);
+    streamHw.startStreamDataMemToFifo(IE+2, 168, 1);
+    streamHw.startStreamDataMemToFifo(IE+3, 169, 1);
+    streamHw.startStreamDataMemToFifo(IE+2, 181, 1);
+    streamHw.startStreamDataMemToFifo(IE+3, 180, 1);
+
+    streamHw.startStreamDataFifoToMem(167,  IE+8, 1); // T8
+    streamHw.startStreamDataFifoToMem(179,  IE+9, 1); // T9
+    streamHw.startStreamDataFifoToMem(169, IE+10, 1); // T10
+    streamHw.startStreamDataFifoToMem(181, IE+11, 1); // T11
+    streamHw.runPipeline();
+
+    // Fourth Pipeline -> X[ID]
+    streamHw.startStreamDataMemToFifo(IS,      1, 1);
+    streamHw.startStreamDataMemToFifo(IE+8,    3, 1);
+    streamHw.startStreamDataMemToFifo(IS,      9, 1);
+    streamHw.startStreamDataMemToFifo(IE+8,   11, 1);
+    streamHw.startStreamDataMemToFifo(IE+9,   35, 1);
+    streamHw.startStreamDataMemToFifo(IS+2,   37, 1);
+    streamHw.startStreamDataMemToFifo(IE+9,   31, 1);
+    streamHw.startStreamDataMemToFifo(IS+2,   29, 1);
+    streamHw.startStreamDataMemToFifo(IE+10, 172, 1);
+    streamHw.startStreamDataMemToFifo(IS+3,  173, 1);
+    streamHw.startStreamDataMemToFifo(IE+10,  57, 1);
+    streamHw.startStreamDataMemToFifo(IS+3,   65, 1);
+    streamHw.startStreamDataMemToFifo(IS+1,   43, 1);
+    streamHw.startStreamDataMemToFifo(IE+11,  45, 1);
+    streamHw.startStreamDataMemToFifo(IS+1,   75, 1);
+    streamHw.startStreamDataMemToFifo(IE+11,  77, 1);
+
+    streamHw.startStreamDataFifoToMem(3,   512+I, 1);
+    streamHw.startStreamDataFifoToMem(11,  576-I, 1);
+    streamHw.startStreamDataFifoToMem(37,  608+I, 1);
+    streamHw.startStreamDataFifoToMem(31,  608-I, 1);
+    streamHw.startStreamDataFifoToMem(173, 640-I, 1);
+    streamHw.startStreamDataFifoToMem(65,  576+I, 1);
+    streamHw.startStreamDataFifoToMem(45,  544+I, 1);
+    streamHw.startStreamDataFifoToMem(77,  544-I, 1);
+    streamHw.runPipeline();
+  }
+  
+  // Save values in the available memory space
+  streamHw.startStreamDataMemToFifo(16, 32, 1);
+  streamHw.startStreamDataFifoToMem(32,   IS, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(48, 32, 1);
+  streamHw.startStreamDataFifoToMem(32,  IS+1, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(272, 32, 1);
+  streamHw.startStreamDataFifoToMem(32,  IS+2, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(304, 32, 1);
+  streamHw.startStreamDataFifoToMem(32,  IS+3, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(400, 32, 1);
+  streamHw.startStreamDataFifoToMem(32,  IS+4, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(432, 32, 1);
+  streamHw.startStreamDataFifoToMem(32,  IS+5, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(528, 32, 1);
+  streamHw.startStreamDataFifoToMem(32,  IS+6, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(560, 32, 1);
+  streamHw.startStreamDataFifoToMem(32,  IS+7, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(784, 32, 1);
+  streamHw.startStreamDataFifoToMem(32,  IS+8, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(816, 32, 1);
+  streamHw.startStreamDataFifoToMem(32,  IS+9, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(0, 32, 1);
+  streamHw.startStreamDataFifoToMem(32, IS+10, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(256, 32, 1);
+  streamHw.startStreamDataFifoToMem(32, IS+11, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(384, 32, 1);
+  streamHw.startStreamDataFifoToMem(32, IS+12, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(512, 32, 1);
+  streamHw.startStreamDataFifoToMem(32, IS+13, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(768, 32, 1);
+  streamHw.startStreamDataFifoToMem(32, IS+14, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(96, 32, 1);
+  streamHw.startStreamDataFifoToMem(32, IS+15, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(352, 32, 1);
+  streamHw.startStreamDataFifoToMem(32, IS+16, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(480, 32, 1);
+  streamHw.startStreamDataFifoToMem(32, IS+17, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(608, 32, 1);
+  streamHw.startStreamDataFifoToMem(32, IS+18, 1);
+  streamHw.runPipeline();
+  streamHw.startStreamDataMemToFifo(864, 32, 1);
+  streamHw.startStreamDataFifoToMem(32, IS+19, 1);
+  streamHw.runPipeline();
+
+  // First pipeline - TX & X[I]
+  streamHw.startStreamDataMemToFifo(112,   122, 1);
+  streamHw.startStreamDataMemToFifo(80,    123, 1);
+  streamHw.startStreamDataMemToFifo(336,   186, 1);
+  streamHw.startStreamDataMemToFifo(368,   187, 1);
+  streamHw.startStreamDataMemToFifo(464,   188, 1);
+  streamHw.startStreamDataMemToFifo(496,   189, 1);
+  streamHw.startStreamDataMemToFifo(592,   190, 1);
+  streamHw.startStreamDataMemToFifo(624,   191, 1);
+  streamHw.startStreamDataMemToFifo(848,   192, 1);
+  streamHw.startStreamDataMemToFifo(880,   193, 1);
+  streamHw.startStreamDataMemToFifo(112,   200, 1);
+  streamHw.startStreamDataMemToFifo(80,    201, 1);
+  streamHw.startStreamDataMemToFifo(368,   202, 1);
+  streamHw.startStreamDataMemToFifo(336,   203, 1);
+  streamHw.startStreamDataMemToFifo(496,   204, 1);
+  streamHw.startStreamDataMemToFifo(464,   205, 1);
+  streamHw.startStreamDataMemToFifo(624,   206, 1);
+  streamHw.startStreamDataMemToFifo(592,   207, 1);
+  streamHw.startStreamDataMemToFifo(880,   208, 1);
+  streamHw.startStreamDataMemToFifo(848,   209, 1);
+  streamHw.startStreamDataMemToFifo(IS+15, 175, 1);
+  streamHw.startStreamDataMemToFifo(64,    174, 1);
+  streamHw.startStreamDataMemToFifo(IS+16, 177, 1);
+  streamHw.startStreamDataMemToFifo(320,   176, 1);
+  streamHw.startStreamDataMemToFifo(IS+17, 179, 1);
+  streamHw.startStreamDataMemToFifo(448,   178, 1);
+  streamHw.startStreamDataMemToFifo(IS+18, 181, 1);
+  streamHw.startStreamDataMemToFifo(576,   180, 1);
+  streamHw.startStreamDataMemToFifo(IS+19, 183, 1);
+  streamHw.startStreamDataMemToFifo(832,   182, 1);
+  streamHw.startStreamDataMemToFifo(IS+15,   1, 1);
+  streamHw.startStreamDataMemToFifo(64,      3, 1);
+
+  streamHw.startStreamDataFifoToMem(123,    IE, 1);
+  streamHw.startStreamDataFifoToMem(187,  IE+1, 1);
+  streamHw.startStreamDataFifoToMem(189,  IE+2, 1);
+  streamHw.startStreamDataFifoToMem(191,  IE+3, 1);
+  streamHw.startStreamDataFifoToMem(193,  IE+4, 1);
+  streamHw.startStreamDataFifoToMem(201,  IE+5, 1);
+  streamHw.startStreamDataFifoToMem(203,  IE+6, 1);
+  streamHw.startStreamDataFifoToMem(205,  IE+7, 1);
+  streamHw.startStreamDataFifoToMem(207,  IE+8, 1);
+  streamHw.startStreamDataFifoToMem(209,  IE+9, 1);
+  streamHw.startStreamDataFifoToMem(175,    96, 1);
+  streamHw.startStreamDataFifoToMem(177,   352, 1);
+  streamHw.startStreamDataFifoToMem(179,   480, 1);
+  streamHw.startStreamDataFifoToMem(181,   608, 1);
+  streamHw.startStreamDataFifoToMem(183,   864, 1);
+  streamHw.startStreamDataFifoToMem(3,   IE+10, 1);
+  streamHw.runPipeline();
+
+  // Second pipeline Adds
+  streamHw.startStreamDataMemToFifo(IS+16,   1, 1);
+  streamHw.startStreamDataMemToFifo(320,     3, 1);
+  streamHw.startStreamDataMemToFifo(IS+17,  21, 1);
+  streamHw.startStreamDataMemToFifo(448,    23, 1);
+  streamHw.startStreamDataMemToFifo(IS+18,  25, 1);
+  streamHw.startStreamDataMemToFifo(576,    31, 1);
+  streamHw.startStreamDataMemToFifo(IS+19,  35, 1);
+  streamHw.startStreamDataMemToFifo(832,    37, 1);
+  streamHw.startStreamDataMemToFifo(IE+5,   43, 1);
+  streamHw.startStreamDataMemToFifo(IS,     45, 1);
+  streamHw.startStreamDataMemToFifo(IE,     51, 1);
+  streamHw.startStreamDataMemToFifo(IS+1,   53, 1);
+  streamHw.startStreamDataMemToFifo(IE+6,   59, 1);
+  streamHw.startStreamDataMemToFifo(IS+2,   61, 1);
+  streamHw.startStreamDataMemToFifo(IE+1,   67, 1);
+  streamHw.startStreamDataMemToFifo(IS+3,   69, 1);
+  streamHw.startStreamDataMemToFifo(IE+7,   79, 1);
+  streamHw.startStreamDataMemToFifo(IS+4,   81, 1);
+  streamHw.startStreamDataMemToFifo(IE+2,   95, 1);
+  streamHw.startStreamDataMemToFifo(IS+5,   97, 1);
+  streamHw.startStreamDataMemToFifo(IE+8,  103, 1);
+  streamHw.startStreamDataMemToFifo(IS+6,  105, 1);
+  streamHw.startStreamDataMemToFifo(IE+3,  124, 1);
+  streamHw.startStreamDataMemToFifo(IS+7,  125, 1);
+  streamHw.startStreamDataMemToFifo(IE+9,  166, 1);
+  streamHw.startStreamDataMemToFifo(IS+8,  167, 1);
+  streamHw.startStreamDataMemToFifo(IE+4,  168, 1);
+  streamHw.startStreamDataMemToFifo(IS+9,  169, 1);
+  streamHw.startStreamDataMemToFifo(IE+10, 170, 1);
+  streamHw.startStreamDataMemToFifo(IS+10, 171, 1);
+
+  streamHw.startStreamDataFifoToMem(3,  IE+11, 1);
+  streamHw.startStreamDataFifoToMem(23, IE+12, 1);
+  streamHw.startStreamDataFifoToMem(31, IE+13, 1);
+  streamHw.startStreamDataFifoToMem(37, IE+14, 1);
+  streamHw.startStreamDataFifoToMem(45,    16, 1);
+  streamHw.startStreamDataFifoToMem(53,   112, 1);
+  streamHw.startStreamDataFifoToMem(61,   272, 1);
+  streamHw.startStreamDataFifoToMem(69,   368, 1);
+  streamHw.startStreamDataFifoToMem(81,   400, 1);
+  streamHw.startStreamDataFifoToMem(97,   496, 1);
+  streamHw.startStreamDataFifoToMem(105,  528, 1);
+  streamHw.startStreamDataFifoToMem(125,  624, 1);
+  streamHw.startStreamDataFifoToMem(167,  784, 1);
+  streamHw.startStreamDataFifoToMem(169,  880, 1);
+  streamHw.startStreamDataFifoToMem(171,    0, 1);
+  streamHw.runPipeline();
+  
+  // Third pipeline Subs
+  streamHw.startStreamDataMemToFifo(IS,   9, 1);
+  streamHw.startStreamDataMemToFifo(IE+5,  11, 1);
+  streamHw.startStreamDataMemToFifo(IE,  31, 1);
+  streamHw.startStreamDataMemToFifo(IS+1,  29, 1);
+  streamHw.startStreamDataMemToFifo(IS+2, 185, 1);
+  streamHw.startStreamDataMemToFifo(IE+6, 184, 1);
+  streamHw.startStreamDataMemToFifo(IE+1,  57, 1);
+  streamHw.startStreamDataMemToFifo(IS+3,  65, 1);
+  streamHw.startStreamDataMemToFifo(IS+4,  75, 1);
+  streamHw.startStreamDataMemToFifo(IE+7,  77, 1);
+  streamHw.startStreamDataMemToFifo(IE+2,  87, 1);
+  streamHw.startStreamDataMemToFifo(IS+5,  89, 1);
+  streamHw.startStreamDataMemToFifo(IS+6,  91, 1);
+  streamHw.startStreamDataMemToFifo(IE+8,  93, 1);
+  streamHw.startStreamDataMemToFifo(IE+3,  97, 1);
+  streamHw.startStreamDataMemToFifo(IS+7, 101, 1);
+  streamHw.startStreamDataMemToFifo(IS+8, 105, 1);
+  streamHw.startStreamDataMemToFifo(IE+9, 109, 1);
+  streamHw.startStreamDataMemToFifo(IE+4, 127, 1);
+  streamHw.startStreamDataMemToFifo(IS+9, 126, 1);
+  streamHw.startStreamDataMemToFifo(IS+10, 129, 1);
+  streamHw.startStreamDataMemToFifo(IE+10, 128, 1);
+  streamHw.startStreamDataMemToFifo(IS+11, 175, 1);
+  streamHw.startStreamDataMemToFifo(IE+11, 174, 1);
+  streamHw.startStreamDataMemToFifo(IS+12, 177, 1);
+  streamHw.startStreamDataMemToFifo(IE+12, 176, 1);
+  streamHw.startStreamDataMemToFifo(IS+13, 179, 1);
+  streamHw.startStreamDataMemToFifo(IE+13, 178, 1);
+  streamHw.startStreamDataMemToFifo(IS+14, 181, 1);
+  streamHw.startStreamDataMemToFifo(IE+14, 180, 1);
+
+  streamHw.startStreamDataFifoToMem(11,   48, 1);
+  streamHw.startStreamDataFifoToMem(31,   80, 1);
+  streamHw.startStreamDataFifoToMem(185, 304, 1);
+  streamHw.startStreamDataFifoToMem(65,  336, 1);
+  streamHw.startStreamDataFifoToMem(77,  432, 1);
+  streamHw.startStreamDataFifoToMem(89,  464, 1);
+  streamHw.startStreamDataFifoToMem(93,  560, 1);
+  streamHw.startStreamDataFifoToMem(101, 592, 1);
+  streamHw.startStreamDataFifoToMem(109, 816, 1);
+  streamHw.startStreamDataFifoToMem(127, 848, 1);
+  streamHw.startStreamDataFifoToMem(129,  64, 1);
+  streamHw.startStreamDataFifoToMem(175, 320, 1);
+  streamHw.startStreamDataFifoToMem(177, 448, 1);
+  streamHw.startStreamDataFifoToMem(179, 576, 1);
+  streamHw.startStreamDataFifoToMem(181, 832, 1);
+  streamHw.runPipeline();
+
+  // Fourth pipeline Adds
+  streamHw.startStreamDataMemToFifo(IS+13,  1, 1);
+  streamHw.startStreamDataMemToFifo(IE+13,  3, 1);
+  streamHw.startStreamDataMemToFifo(IS+14, 21, 1);
+  streamHw.startStreamDataMemToFifo(IE+14, 23, 1);
+  streamHw.startStreamDataMemToFifo(IS+12, 25, 1);
+  streamHw.startStreamDataMemToFifo(IE+12, 31, 1);
+  streamHw.startStreamDataMemToFifo(IE+11, 172, 1);
+  streamHw.startStreamDataMemToFifo(IS+11, 173, 1);
+  
+  streamHw.startStreamDataFifoToMem(3,   512, 1);
+  streamHw.startStreamDataFifoToMem(23,  768, 1);
+  streamHw.startStreamDataFifoToMem(31,  384, 1);
+  streamHw.startStreamDataFifoToMem(173, 256, 1);
+  streamHw.runPipeline();
+}
+
 void fft_8_Streamed(ec::StreamHw& streamHw)
 {
   int IS = 1024;
@@ -4521,22 +5122,22 @@ void fft_8_Streamed(ec::StreamHw& streamHw)
   streamHw.startStreamDataMemToFifo(176,   118, 1);
   streamHw.startStreamDataMemToFifo(144,   119, 1);
 
-  streamHw.startStreamDataFifoToMem(201,  IE+1, 32); // T1
-  streamHw.startStreamDataFifoToMem(187,  IE+2, 32); // T2
-  streamHw.startStreamDataFifoToMem(203,  IE+4, 32); // T4
-  streamHw.startStreamDataFifoToMem(189,  IE+5, 32); // T5
-  streamHw.startStreamDataFifoToMem(205,  IE+7, 32); // T7
-  streamHw.startStreamDataFifoToMem(191,  IE+8, 32); // T8
-  streamHw.startStreamDataFifoToMem(175,   192, 32); // X[192]
-  streamHw.startStreamDataFifoToMem(177,   704, 32); // X[704]
-  streamHw.startStreamDataFifoToMem(179,   960, 32); // X[960]
-  streamHw.startStreamDataFifoToMem(167,  IE+6, 32); // T6
-  streamHw.startStreamDataFifoToMem(169,  IE+3, 32); // T3
-  streamHw.startStreamDataFifoToMem(37,     IE, 32); // T0
-  streamHw.startStreamDataFifoToMem(115,  IE+9, 32); // T9
-  streamHw.startStreamDataFifoToMem(113, IE+10, 32); // T10
-  streamHw.startStreamDataFifoToMem(121, IE+11, 32); // T11
-  streamHw.startStreamDataFifoToMem(119, IE+12, 32); // T12
+  streamHw.startStreamDataFifoToMem(201,  IE+1, 1); // T1
+  streamHw.startStreamDataFifoToMem(187,  IE+2, 1); // T2
+  streamHw.startStreamDataFifoToMem(203,  IE+4, 1); // T4
+  streamHw.startStreamDataFifoToMem(189,  IE+5, 1); // T5
+  streamHw.startStreamDataFifoToMem(205,  IE+7, 1); // T7
+  streamHw.startStreamDataFifoToMem(191,  IE+8, 1); // T8
+  streamHw.startStreamDataFifoToMem(175,   192, 1); // X[192]
+  streamHw.startStreamDataFifoToMem(177,   704, 1); // X[704]
+  streamHw.startStreamDataFifoToMem(179,   960, 1); // X[960]
+  streamHw.startStreamDataFifoToMem(167,  IE+6, 1); // T6
+  streamHw.startStreamDataFifoToMem(169,  IE+3, 1); // T3
+  streamHw.startStreamDataFifoToMem(37,     IE, 1); // T0
+  streamHw.startStreamDataFifoToMem(115,  IE+9, 1); // T9
+  streamHw.startStreamDataFifoToMem(113, IE+10, 1); // T10
+  streamHw.startStreamDataFifoToMem(121, IE+11, 1); // T11
+  streamHw.startStreamDataFifoToMem(119, IE+12, 1); // T12
   streamHw.runPipeline();
   
   // Second Pipeline -> X[ID]
